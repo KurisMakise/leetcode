@@ -1,5 +1,6 @@
 package solution;
 
+
 /**
  * <p>
  * TODO
@@ -12,52 +13,130 @@ package solution;
 public class Code8 {
     public static void main(String[] args) {
         Code8 code8 = new Code8();
+
         System.out.println(code8.myAtoi("2147483648"));
+
     }
 
     public int myAtoi(String str) {
-        char[] chars = str.trim().toCharArray();
+        Automaton automaton = new Automaton();
+        for (int i = 0; i < str.length(); i++) {
+            automaton.get(str.charAt(i));
+        }
+        return automaton.ans * automaton.sign;
+    }
 
-        if (chars.length == 0)
-            return 0;
 
-        int result = 0;
+    public static class Automaton {
+        private MachineState curState = MachineState.START;
+        private int sign = 1;
+        private int ans = 0;
+        private int ansRemain = 0;
+        private int index = 0;
+        private boolean start = false;
 
-        int type = 2;//0 -; 1+; 2 null
+        public void get(char c) {
+            curState = transitionTable[curState.getVal()][getCol(c)];
+            if (curState == MachineState.SIGN) {
+                sign = c == '+' ? 1 : -1;
+            } else if (curState == MachineState.READ_NUMBER) {
+                ans = ans * 10 + c - '0';
 
-        if (chars[0] == '-') {
-            type = 0;
-        } else if (chars[0] == '+') {
-            type = 1;
-        } else if (chars[0] >= '0' && chars[0] <= '9') {
-            result = chars[0] - '0';
-        } else {
-            return 0;
+                if (start) {
+                    index++;
+                } else {
+                    if (ans != 0) {
+                        start = true;
+                        index++;
+                    }
+                }
+                if (index == 10) {
+                    if (ans == Integer.MAX_VALUE / 10) {
+                        ansRemain = ansRemain * 10 + c - '0';
+                        if (ansRemain >= 8) {
+                            setAnsMax();
+                        } else {
+                            ans = ans * 10 + ansRemain;
+                        }
+                    }
+                    return;
+                }
+                if (index == 11) {
+                    setAnsMax();
+                    curState = MachineState.END;
+                    return;
+                }
+
+
+            }
         }
 
-        for (int i = 1; i < chars.length; i++) {
-            if (chars[i] < '0' || chars[i] > '9') {
-                if (type == 0)
-                    return -1 * result;
-                else
-                    return result;
-            }
-            try {
-                int tmp = result * 10;
-                if (tmp / 10 != result)
-                    throw new Exception();
-                result = tmp + chars[i] - '0';
-                if (result - (chars[i] - '0') != tmp)
-                    throw new Exception();
-            } catch (Exception e) {
-                if (type == 1 || type == 2)
-                    return Integer.MAX_VALUE;
-                else
-                    return Integer.MIN_VALUE;
+        private void setAnsMax() {
+            if (sign == -1) {
+                ans = Integer.MIN_VALUE;
+                sign = 1;
+            } else {
+                ans = Integer.MAX_VALUE;
             }
         }
-        if (type == 0)
-            return -1 * result;
-        return result;
+
+        private final MachineState[][] transitionTable = new MachineState[][]
+                {
+                        {MachineState.START, MachineState.SIGN, MachineState.READ_NUMBER, MachineState.END},
+                        {MachineState.END, MachineState.END, MachineState.READ_NUMBER, MachineState.END},
+                        {MachineState.END, MachineState.END, MachineState.READ_NUMBER, MachineState.END},
+                        {MachineState.END, MachineState.END, MachineState.END, MachineState.END},
+                };
+
+        /**
+         * 获取转移表下标
+         *
+         * @param c 字符
+         * @return 下标
+         */
+        private int getCol(char c) {
+            if (c == ' ') {
+                return 0;
+            } else if (c == '-' || c == '+') {
+                return 1;
+            } else if (c >= '0' && c <= '9') {
+                return 2;
+            } else {
+                return 3;
+            }
+        }
+
+    }
+
+    /**
+     * 状态机
+     */
+    public enum MachineState {
+        /**
+         * 开始
+         */
+        START(0),
+        /**
+         * 变量值
+         */
+        SIGN(1),
+        /**
+         * 读数据
+         */
+        READ_NUMBER(2),
+        /**
+         * 返回结果
+         */
+        END(3);
+
+        MachineState(int val) {
+            this.val = val;
+        }
+
+        public int val;
+
+        public int getVal() {
+            return val;
+        }
     }
 }

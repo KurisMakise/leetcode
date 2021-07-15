@@ -1,5 +1,6 @@
 package algorithm;
 
+import algorithm.automata.Tire;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,7 +18,7 @@ public class TrieTest {
 
     @Test
     public void insertTest() {
-        Trie trie = new Trie();
+        Tire trie = new Tire();
         trie.insert("test");
         trie.insert("testt");
         trie.insert("taba");
@@ -26,6 +27,6 @@ public class TrieTest {
         System.out.println(trie.find("tab"));
         System.out.println(trie.find("taba"));
 
-        Assert.assertFalse("teste应当不存在",trie.find("teste"));
+        Assert.assertEquals("teste应当不存在",trie.find("teste"));
     }
 }

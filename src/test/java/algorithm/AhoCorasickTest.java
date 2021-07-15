@@ -1,5 +1,6 @@
 package algorithm;
 
+import algorithm.automata.AhoCorasick;
 import org.junit.Test;
 
 import java.util.Arrays;

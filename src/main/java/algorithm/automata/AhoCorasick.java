@@ -1,5 +1,7 @@
-package algorithm;
+package algorithm.automata;
 
+import algorithm.AcNode;
+import algorithm.MatchResult;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Iterator;
@@ -17,7 +19,7 @@ import java.util.Queue;
  */
 public class AhoCorasick {
 
-    private Trie trie = new Trie();
+    private Tire trie = new Tire();
 
     /**
      * 插入模式船
@@ -36,20 +38,20 @@ public class AhoCorasick {
     }
 
     private void buildFailurePointer() {
-        AcNode p = trie.getRoot();
+        algorithm.AcNode p = trie.getRoot();
 
-        Queue<AcNode> queue = new LinkedList<>();
+        Queue<algorithm.AcNode> queue = new LinkedList<>();
         while (p != null) {
             for (int i = 0; i < p.children.length; i++) {
-                AcNode pc = p.children[i];
+                algorithm.AcNode pc = p.children[i];
                 if (pc == null) {
                     continue;
                 }
                 queue.add(pc);
 
-                AcNode q = p.failure;
+                algorithm.AcNode q = p.failure;
                 while (q != null) {
-                    AcNode qc = q.children[pc.val - '/'];
+                    algorithm.AcNode qc = q.children[pc.val - '/'];
                     if (qc == null) {
                         q = q.failure;
                     } else {
@@ -77,8 +79,8 @@ public class AhoCorasick {
 
         char[] chars = text.toCharArray();
 
-        AcNode root = trie.getRoot();
-        AcNode node = trie.getRoot();
+        algorithm.AcNode root = trie.getRoot();
+        algorithm.AcNode node = trie.getRoot();
 
         int i = start == null ? 0 : start;
 
