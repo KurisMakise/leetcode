@@ -5,7 +5,7 @@ package algorithm.automata;
  * @version 1.0
  * @date 2020/6/22 11:33
  */
-public class Tire {
+public class Trie {
 
     private TireNode root = new TireNode('/');
 
