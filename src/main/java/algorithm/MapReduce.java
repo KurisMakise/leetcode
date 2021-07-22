@@ -2,71 +2,65 @@ package algorithm;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 /**
- * @author kurisu makise
+ * @author makise
  * @version 1.0
- * @date 2021/4/12 16:56
+ * @date 2021/7/18 10:15
  */
 public class MapReduce extends RecursiveTask<Map<String, Long>> {
 
-
     public static void main(String[] args) {
-        String[] words = {
-
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        String[] words = new String[]{
+                "this is a test",
+                "test is good a thing",
         };
         MapReduce mapReduce = new MapReduce(words, 0, words.length);
+        Map<String, Long> invoke = forkJoinPool.invoke(mapReduce);
 
-        ForkJoinPool forkJoinPool = new ForkJoinPool(4);
-        try {
-            System.out.println(forkJoinPool.submit(mapReduce).get());
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        System.out.println(invoke);
     }
 
-    public MapReduce(String[] fc, int start, int end) {
+    public MapReduce(String[] words, int start, int end) {
+        this.words = words;
         this.start = start;
         this.end = end;
-        this.fc = fc;
     }
 
+    private final String[] words;
     private final int start;
     private final int end;
-    private final String[] fc;
 
     @Override
     protected Map<String, Long> compute() {
         if (end - start == 1) {
-            return calculate(fc[start]);
+            return cal();
         }
-        int middle = (end + start) / 2;
-        MapReduce mr1 = new MapReduce(fc, start, middle);
-        MapReduce mr2 = new MapReduce(fc, middle, end);
-        mr1.fork();
+        int mid = (start + end) / 2;
+        MapReduce mr1 = new MapReduce(words, start, mid);
+        MapReduce mr2 = new MapReduce(words, mid , end );
 
-        return merge(mr1.join(), mr2.compute());
-    }
+        Map<String, Long> m1 = mr1.compute();
+        mr2.fork();
+        Map<String, Long> m2 = mr2.join();
 
-    private Map<String, Long> merge(Map<String, Long> r1, Map<String, Long> r2) {
-        r1.forEach((key, value)
-                -> r2.compute(key, (k, v) -> v == null ? value : v + value));
-        return r2;
-    }
-
-    private Map<String, Long> calculate(String line) {
-        Map<String, Long> result = new HashMap<>(30);
-
-        String[] split = line.split("\\s+");
-        for (String s : split) {
-            result.compute(s, (key, value) -> value == null ? 1 : ++value);
+        for (Map.Entry<String, Long> entry : m1.entrySet()) {
+            m2.compute(entry.getKey(), (key, value) -> value == null ? entry.getValue() : entry.getValue() + value);
         }
 
-        return result;
+        return m2;
     }
 
+    private Map<String, Long> cal() {
+        String[] word = words[start].split("\\s");
+        Map<String, Long> map = new HashMap<>(word.length);
 
+        for (String w : word) {
+            map.compute(w, (k, v) -> v == null ? 1 : ++v);
+        }
+        return map;
+    }
 }

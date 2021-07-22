@@ -17,7 +17,7 @@ public class Test {
         int x = 0;
         while (x < n) {
 
-            x += Math.min(m, x);
+            x += Math.min(m, n);
             times++;
         }
         return times;

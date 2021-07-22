@@ -1,6 +1,5 @@
 package solution;
 
-
 /**
  * <p>
  * TODO
@@ -11,89 +10,128 @@ package solution;
  * @since 2019/4/28 19:53
  */
 public class Code8 {
+    private static final char POSITIVE = '+';
+    private static final char NEGATIVE = '-';
+    private static final int MAX = (int) Math.pow(2, 31);
+    private static final int MIN = -MAX;
+
+    public int myAtoi(String s) {
+        s = s.trim();
+        if (s.length() == 0) {
+            return 0;
+        }
+        char sign;
+        if (s.charAt(0) == POSITIVE) {
+            sign = POSITIVE;
+            s = s.substring(1);
+        } else if (s.charAt(0) == NEGATIVE) {
+            sign = NEGATIVE;
+            s = s.substring(1);
+        } else {
+            sign = POSITIVE;
+        }
+
+        int[] position = getNumPosition(s);
+        if (position[0] == -1) {
+            return 0;
+        }
+        return combine(sign, s.substring(position[0], position[1] + 1));
+//        Automaton automaton = new Automaton();
+//        for (int i = 0; i < s.length(); i++) {
+//            automaton.add(s.charAt(i));
+//        }
+//        return automaton.getAnswer();
+    }
+
     public static void main(String[] args) {
         Code8 code8 = new Code8();
-
-        System.out.println(code8.myAtoi("2147483648"));
-
+        System.out.println(code8.myAtoi("91283472332"));
+        System.out.println(code8.myAtoi("-91283472332"));
     }
 
-    public int myAtoi(String str) {
-        Automaton automaton = new Automaton();
-        for (int i = 0; i < str.length(); i++) {
-            automaton.get(str.charAt(i));
+
+    public int combine(int sign, String number) {
+        int num;
+        try {
+            num = Integer.parseInt(number);
+        } catch (Exception e) {
+            if (sign == POSITIVE) {
+                return MAX;
+            } else {
+                return MIN - 1;
+            }
         }
-        return automaton.ans * automaton.sign;
+
+        if (sign == POSITIVE) {
+            return num;
+        } else {
+            return -num;
+        }
     }
 
+    public int[] getNumPosition(String s) {
+        char tmp;
+        int start = -1, end = -1;
+        for (int i = 0; i < s.length(); i++) {
+            tmp = s.charAt(i);
+            if (isNumber(tmp)) {
+                if (start == -1) {
+                    start = i;
+                }
+                end = i;
+            } else {
+                break;
+            }
+        }
 
-    public static class Automaton {
-        private MachineState curState = MachineState.START;
+        return new int[]{start, end};
+    }
+
+    public boolean isNumber(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    /**
+     * 自动机解法
+     */
+    class Automaton {
+        private int ans;
         private int sign = 1;
-        private int ans = 0;
-        private int ansRemain = 0;
-        private int index = 0;
-        private boolean start = false;
+        private MachineState curState = MachineState.START;
 
-        public void get(char c) {
-            curState = transitionTable[curState.getVal()][getCol(c)];
-            if (curState == MachineState.SIGN) {
-                sign = c == '+' ? 1 : -1;
-            } else if (curState == MachineState.READ_NUMBER) {
-                ans = ans * 10 + c - '0';
 
-                if (start) {
-                    index++;
-                } else {
-                    if (ans != 0) {
-                        start = true;
-                        index++;
-                    }
-                }
-                if (index == 10) {
-                    if (ans == Integer.MAX_VALUE / 10) {
-                        ansRemain = ansRemain * 10 + c - '0';
-                        if (ansRemain >= 8) {
-                            setAnsMax();
-                        } else {
-                            ans = ans * 10 + ansRemain;
-                        }
-                    }
+        private void add(char c) {
+            curState = transitionState[curState.val][getCol(c)];
+            if (curState == MachineState.READ_NUMBER) {
+                if (sign == -1 && (ans * -1 < (Integer.MIN_VALUE + c - '0') / 10)) {
+                    ans = Integer.MIN_VALUE;
+                    sign = 1;
+                    curState = MachineState.END;
                     return;
-                }
-                if (index == 11) {
-                    setAnsMax();
+                } else if (sign == 1 && ans > (Integer.MAX_VALUE - c + '0') / 10) {
+                    ans = Integer.MAX_VALUE;
                     curState = MachineState.END;
                     return;
                 }
-
-
+                ans = ans * 10 + c - '0';
+            } else if (curState == MachineState.SIGN) {
+                if (c == '-') {
+                    sign = -1;
+                }
             }
         }
 
-        private void setAnsMax() {
-            if (sign == -1) {
-                ans = Integer.MIN_VALUE;
-                sign = 1;
-            } else {
-                ans = Integer.MAX_VALUE;
-            }
+        public int getAnswer() {
+            return ans * sign;
         }
 
-        private final MachineState[][] transitionTable = new MachineState[][]
-                {
-                        {MachineState.START, MachineState.SIGN, MachineState.READ_NUMBER, MachineState.END},
-                        {MachineState.END, MachineState.END, MachineState.READ_NUMBER, MachineState.END},
-                        {MachineState.END, MachineState.END, MachineState.READ_NUMBER, MachineState.END},
-                        {MachineState.END, MachineState.END, MachineState.END, MachineState.END},
-                };
+        private final MachineState[][] transitionState = new MachineState[][]{
+                {MachineState.START, MachineState.SIGN, MachineState.READ_NUMBER, MachineState.END},
+                {MachineState.END, MachineState.END, MachineState.READ_NUMBER, MachineState.END},
+                {MachineState.END, MachineState.END, MachineState.READ_NUMBER, MachineState.END},
+                {MachineState.END, MachineState.END, MachineState.END, MachineState.END}
+        };
 
-        /**
-         * 获取转移表下标
-         *
-         * @param c 字符
-         * @return 下标
-         */
         private int getCol(char c) {
             if (c == ' ') {
                 return 0;
@@ -111,32 +149,34 @@ public class Code8 {
     /**
      * 状态机
      */
-    public enum MachineState {
+    enum MachineState {
         /**
          * 开始
          */
         START(0),
         /**
-         * 变量值
+         * 符号
          */
         SIGN(1),
         /**
-         * 读数据
+         * 读数
          */
         READ_NUMBER(2),
         /**
-         * 返回结果
+         * 结束
          */
         END(3);
+
+        private int val;
 
         MachineState(int val) {
             this.val = val;
         }
 
-        public int val;
-
         public int getVal() {
             return val;
         }
+
     }
+
 }
