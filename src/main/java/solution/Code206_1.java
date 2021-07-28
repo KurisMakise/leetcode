@@ -21,13 +21,19 @@ public class Code206_1 {
         return p;
     }
 
-    public static class ListNode {
-        public int val;
-        public ListNode next;
+    public static void main(String[] args) {
+        solution.ListNode listNode = new solution.ListNode(1);
+        solution.ListNode tmp = listNode;
+        listNode.next = new solution.ListNode(2);
+        listNode = listNode.next;
+        listNode.next = new solution.ListNode(3);
+        listNode = listNode.next;
+        listNode.next = new solution.ListNode(4);
+        listNode = listNode.next;
+        listNode.next = new solution.ListNode(5);
 
-        public ListNode(int x) {
-            val = x;
-        }
+        Code206_1 code206_2 = new Code206_1();
+        System.out.println(code206_2.reverseList(tmp));
     }
 
 }

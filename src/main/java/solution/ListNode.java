@@ -17,4 +17,17 @@ public class ListNode {
         val = x;
         next = null;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(val);
+        ListNode tmp = next;
+
+        while (tmp != null) {
+            sb.append(tmp.val);
+            tmp = tmp.next;
+        }
+        return sb.toString();
+    }
 }
