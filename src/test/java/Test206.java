@@ -27,13 +27,6 @@ public class Test206 {
 
     @Test
     public void test1() {
-        Code206_1.ListNode head = new Code206_1.ListNode(1);
-        head.next = new Code206_1.ListNode(2);
-        head.next.next = new Code206_1.ListNode(3);
-        head.next.next.next = new Code206_1.ListNode(4);
 
-        Code206_1 code206 = new Code206_1();
-        Code206_1.ListNode node = code206.reverseList(head);
-        System.out.println(node);
     }
 }
