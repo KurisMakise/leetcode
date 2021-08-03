@@ -25,7 +25,7 @@ public class ObserverRegistry {
             List<Method> annotatedMethods = getAnnotatedMethods(observer.getClass());
             annotatedMethods.forEach(method -> {
                 Class<?> parameterType = method.getParameterTypes()[0];
-                if (event.getClass() == parameterType) {
+                if (event.getClass().isAssignableFrom(parameterType)) {
                     observerActions.add(new ObserverAction(observer, method));
                 }
             });

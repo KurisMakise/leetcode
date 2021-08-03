@@ -1,5 +1,8 @@
 package design.eventbus;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * @author makise
  * @version 1.0
@@ -7,13 +10,16 @@ package design.eventbus;
  */
 public class Test {
     public static void main(String[] args) {
-        EventBus eventBus = new EventBus();
+        EventBus eventBus = new AsyncEventBus(Executors.newFixedThreadPool(10));
         eventBus.register(new TestA());
         eventBus.register(new TestB());
+        for(int i=0;i<10;i++){
+            eventBus.post("你好啊");
+            eventBus.post(2222);
+        }
 
-        eventBus.post("你好啊");
-        eventBus.post(2222);
     }
+
 
     static class TestA {
 
@@ -26,7 +32,7 @@ public class Test {
     static class TestB {
 
         @Subscribe
-        private void score(int score) {
+        private void score(Integer score) {
             System.out.println(score);
         }
     }
