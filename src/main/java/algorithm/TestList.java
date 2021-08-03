@@ -17,8 +17,6 @@ public class TestList {
         public List(int val) {
             this.val = val;
         }
-
-
     }
 
     public static void main(String[] args) {
