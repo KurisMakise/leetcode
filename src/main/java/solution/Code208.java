@@ -1,7 +1,5 @@
 package solution;
 
-import algorithm.automata.Tire;
-
 /**
  * @author makise
  * @version 1.0
