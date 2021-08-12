@@ -13,10 +13,8 @@ public class Test {
         EventBus eventBus = new AsyncEventBus(Executors.newFixedThreadPool(10));
         eventBus.register(new TestA());
         eventBus.register(new TestB());
-        for(int i=0;i<10;i++){
             eventBus.post("你好啊");
             eventBus.post(2222);
-        }
 
     }
 

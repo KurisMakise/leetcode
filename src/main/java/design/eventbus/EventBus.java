@@ -34,5 +34,4 @@ public class EventBus {
         observerActions.forEach(observerAction -> executor.execute(() -> observerAction.execute(event)));
     }
 
-
 }
