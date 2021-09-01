@@ -8,30 +8,23 @@ package solution;
 public class Code165 {
 
     public static int compareVersion(String version1, String version2) {
+        int n = version1.length(), m = version2.length();
+
         int i = 0, j = 0;
-        while (i < version1.length() || j < version2.length()) {
+        while (i < n || j < m) {
             int a = 0, b = 0;
-            for (; i < version1.length(); i++) {
-                if (version1.charAt(i) != '.') {
-                    a = a * 10 + version1.charAt(i) - '0';
-                } else {
-                    i++;
-                    break;
-                }
+            for (; i < n && version1.charAt(i) != '.'; ++i) {
+                a += a * 10 + version1.charAt(i) - '0';
             }
-            for (; j < version2.length(); j++) {
-                if (version2.charAt(j) != '.') {
-                    b = b * 10 + version2.charAt(j) - '0';
-                } else {
-                    j++;
-                    break;
-                }
+
+            for (; j < m && version2.charAt(j) != '.'; ++j) {
+                b += b * 10 + version2.charAt(j) - '0';
             }
-            if (a > b) {
-                return 1;
-            } else if (a < b) {
-                return -1;
+            if (a != b) {
+                return a > b ? 1 : -1;
             }
+            ++i;
+            ++j;
         }
         return 0;
     }
